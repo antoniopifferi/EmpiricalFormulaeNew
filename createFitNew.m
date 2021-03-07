@@ -1,4 +1,4 @@
-function [fitresult, gof] = createFitNew(mua, mus, AA)
+function [fitresult, gof] = createFitNew(mua, mus, Var, TypeFit, title_var)
 %CREATEFIT(MUA,MUS,AA)
 %  Create a fit.
 %
@@ -16,10 +16,10 @@ function [fitresult, gof] = createFitNew(mua, mus, AA)
 
 
 %% Fit: 'untitled fit 1'.
-[xData, yData, zData] = prepareSurfaceData( mua, mus, AA );
+[xData, yData, zData] = prepareSurfaceData( mua, mus, Var );
 
 % Set up fittype and options.
-ft = fittype( 'poly33' );
+ft = fittype( TypeFit );
 opts = fitoptions( 'Method', 'LinearLeastSquares' );
 opts.Normalize = 'on';
 opts.Robust = 'LAR';
@@ -30,11 +30,11 @@ opts.Robust = 'LAR';
 % Plot fit with data.
 figure( 'Name', 'untitled fit 1' );
 h = plot( fitresult, [xData, yData], zData );
-legend( h, 'untitled fit 1', 'AA vs. mua, mus', 'Location', 'NorthEast', 'Interpreter', 'none' );
+legend( h, 'untitled fit 1', 'True', 'Location', 'NorthEast', 'Interpreter', 'none' );
 % Label axes
 xlabel( 'mua', 'Interpreter', 'none' );
 ylabel( 'mus', 'Interpreter', 'none' );
-zlabel( 'AA', 'Interpreter', 'none' );
+zlabel( title_var, 'Interpreter', 'none' );
 grid on
 view( 28.9, 23.9 );
 
