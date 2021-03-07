@@ -1,0 +1,9 @@
+TODO LIST
+- consolidare programma in modo da renderlo più funzionale
+- plottare errore e mediana per MUA MUS RHO
+- plottare immagine dell'errore
+- studiare vari range
+- riguardare il FIT esponenziale
+- studiare vari ordini della polinomiale
+- scrivere le espressioni polinomiali
+- vedere valori di Z a fianco dell'errore (es. calc errore relativo)
