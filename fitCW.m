@@ -5,6 +5,7 @@ close all
 clear all
 SAVE_AB = 1;
 LOAD_AB = 0;
+SAVE_FIG = 1;
 
 addpath('C:\OneDrivePolimi\OneDrive - Politecnico di Milano\Beta\Programs\MatlabTools')
 %global ii mua mus AA BB;
@@ -15,8 +16,8 @@ addpath('C:\OneDrivePolimi\OneDrive - Politecnico di Milano\Beta\Programs\Matlab
 %% GENERATE OR LOAD LIBRARY OF SIMULATIONS
 if LOAD_AB == 0
     rho = [5:5:100]; %mm
-    mua = [5e-3:1e-3:0.05]; %mm-1
-    mus = [0.5:0.25:5.0]; %mm-1
+    mua = [1e-3:1e-3:0.05]; %mm-1
+    mus = [0.25:0.25:5.0]; %mm-1
 %     rho = [5:5:100];
 %     mua = [0:1e-3:0.05];
 %     mus = [0.25:0.25:5.0];
@@ -44,13 +45,18 @@ nr=numel(rho);
 ns=numel(mus);
 na=numel(mua);
 
+%% ITERATE OVER POL ORDER
+for iPa=1:3 % iterate over MUS POL Order
+    for iPs=1:3 % iterate over MUS POL Order
+
 %% FIT Z with formulae
 Z_calc=zeros(ns,na,nr); % calculated depth (mm)
 Z_err=zeros(ns,na,nr); % calculated error on depth (mm)
 
 % perform FIT
-[A_fitresult, A_gof] = createFitNew(mua, mus, AA, 'poly33', 'AA')
-[B_fitresult, B_gof] = createFitNew(mua, mus, BB, 'poly33', 'BB')
+polytype=['poly' num2str(iPa) num2str(iPs)];
+[A_fitresult, A_gof] = createFitNew(mua, mus, AA, polytype, 'AA')
+[B_fitresult, B_gof] = createFitNew(mua, mus, BB, polytype, 'BB')
 
 % calc error
 for is=1:ns
@@ -69,54 +75,52 @@ figure, plot(abs(Z_err(:)));
 
 %% Visualise ERROR
 scrsz = get(0,'ScreenSize');
-% ox=order(1); oy=order(2); or=order(3); oc=order(4);
-% nx=P(ox).n; ny=P(oy).n; nr=P(or).n; nc=P(oc).n;
-% x=P(ox).a; y=P(oy).a; r=P(or).a; c=P(oc).a;
-% lx=P(ox).l; ly=P(oy).l; lr=P(or).l; lc=P(oc).l;
-% ux=P(ox).u; uy=P(oy).u; ur=P(or).u; uc=P(oc).u;
 
-%x=rho
-%y=Z or Err
-indMua=[1,3,6,10,20];
+indRho=[1,3,6,10,20];
 
-nc=numel(indMua);
-nr=3;
+ncol=numel(indRho);
+nrow=3;
 
-figure('Name','ThisName','Position',[0 0 scrsz(3) scrsz(4)]);
+FigError=figure('Name','ThisName','Position',[0 0 scrsz(3) scrsz(4)]);
 levels=1:100;
-subplot1(nr,nc, 'XTickL', 'Margin', 'YTickL', 'Margin','YScale','linear');
+subplot1(nrow,ncol, 'XTickL', 'Margin', 'YTickL', 'Margin','YScale','linear');
 
 x_title={'Zmax (mm)',' err (mm)','err rel(%)'};
 
-for ir=1:nr
-    for ic=1:nc
-        subplot1(ic+nc*(ir-1));
-        x=rho;
+for ir=1:nrow
+    for ic=1:ncol
+        subplot1(ic+ncol*(ir-1));
+        x=mua;
         y=mus;
         
-        if ir==1, zvalues=squeeze(ZRhoMuaMus(:,indMua(ic),:)); end
-        if ir==2, zvalues=squeeze(Z_err(:,indMua(ic),:)); end
-        if ir==3, zvalues=squeeze(100*Z_err(:,indMua(ic),:)./ZRhoMuaMus(:,indMua(ic),:)); end
+        if ir==1, zvalues=squeeze(ZRhoMuaMus(:,:,indRho(ic))); end
+        if ir==2, zvalues=squeeze(Z_err(:,:,indRho(ic))); end
+        if ir==3, zvalues=squeeze(100*Z_err(:,:,indRho(ic))./ZRhoMuaMus(:,:,indRho(ic))); end
 
-        pcolor(x,y,zvalues); shading interp; colormap(pink); hold on;
-        contour(x,y,zvalues,levels,'b','ShowText','on'); hold off;
+        pcolor(x,y,zvalues); shading interp; colormap(flipud(pink)); hold on;
+        contour(x,y,zvalues,levels,'b','ShowText','on'); hold on;
+        grid on;
+        set(gca,'layer','top')
 
+        if ir==2, caxis([0 3]); end
+        if ir==3, caxis([0 10]); end
 
-        %contour(x,y,zvalues,[tresh_z 1E30],'k','LineWidth',2);
-    %     if(min(x)<0.5*max(x)), minx=0; else minx=min(x); end
-    %     if(min(y)<0.5*max(y)), miny=0; else miny=min(y); end
-    %     xlim([minx max(x)]); ylim([miny max(y)]);
-        if(ir==nr), xlabel('rho (mm)'); end
-        %if(ic==1), ylabel(x_title(ir)); end
-        if(ic==1), ylabel('Mus (mm-1)'); end
-        if(ir==1), title(['Mua = ' num2str(mua(indMua(ic))) ' mm-1']); end
+        if(ir==nrow), xlabel('Mua (mm-1)'); end
+        if((ic==1)&&(ir==1)), ylabel({'Zmax (mm)';'Mus (mm-1)'}); end
+        if((ic==1)&&(ir==2)), ylabel({'err (mm)';'Mus (mm-1)'}); end
+        if((ic==1)&&(ir==3)), ylabel({'rel err (%)';'Mus (mm-1)'}); end
+        if(ir==1), title(['Rho = ' num2str(rho(indRho(ic))) ' mm']); end
         hold off;
     end
 end
 
-%suptitle('Main Title');
-% NameFig=['Results\' Type '_' P(ox).l '_' P(oy).l '_' P(or).l '_' P(oc).l '_' Tag];
-% if SaveFig, save_figure(NameFig); end
+Title=['POLYMua' num2str(iPa) 'Mus' num2str(iPs)];
+suptitle(Title);
+NameFig=['Results\' Title];
+if SAVE_FIG, saveas(FigError,NameFig,'jpg'); end
+
+    end % End iPs
+end % End iPa
 
 
 

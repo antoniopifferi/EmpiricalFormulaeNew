@@ -28,14 +28,18 @@ opts.Robust = 'LAR';
 [fitresult, gof] = fit( [xData, yData], zData, ft, opts );
 
 % Plot fit with data.
-figure( 'Name', 'untitled fit 1' );
+FigPoly=figure( 'Name', 'untitled fit 1' );
 h = plot( fitresult, [xData, yData], zData );
 legend( h, 'untitled fit 1', 'True', 'Location', 'NorthEast', 'Interpreter', 'none' );
 % Label axes
 xlabel( 'mua', 'Interpreter', 'none' );
 ylabel( 'mus', 'Interpreter', 'none' );
 zlabel( title_var, 'Interpreter', 'none' );
+title(TypeFit);
 grid on
 view( 28.9, 23.9 );
+NameFig=['Results\' title_var '_' TypeFit];
+saveas(FigPoly,NameFig,'jpg');
+
 
 
