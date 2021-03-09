@@ -16,8 +16,8 @@ addpath('C:\OneDrivePolimi\OneDrive - Politecnico di Milano\Beta\Programs\Matlab
 %% GENERATE OR LOAD LIBRARY OF SIMULATIONS
 if LOAD_AB == 0
     rho = [5:5:100]; %mm
-    mua = [1e-3:1e-3:0.05]; %mm-1
-    mus = [0.25:0.25:5.0]; %mm-1
+    mua = [3e-3:1e-3:0.05]; %mm-1
+    mus = [0.5:0.25:5.0]; %mm-1
 %     rho = [5:5:100];
 %     mua = [0:1e-3:0.05];
 %     mus = [0.25:0.25:5.0];
