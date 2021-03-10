@@ -1,11 +1,15 @@
 %% Fitting the CW penetration depth
 
-%function fitCW()
 close all
 clear all
 SAVE_AB = 1;
 LOAD_AB = 0;
 SAVE_FIG = 1;
+
+%Parameters
+indRho=[1,3,6,10,20];
+MaxErr=5; % (mm) max displayed eaaror in plot
+MaxPerc=10; % (%) max percentage relative error
 
 addpath('C:\OneDrivePolimi\OneDrive - Politecnico di Milano\Beta\Programs\MatlabTools')
 %global ii mua mus AA BB;
@@ -16,11 +20,8 @@ addpath('C:\OneDrivePolimi\OneDrive - Politecnico di Milano\Beta\Programs\Matlab
 %% GENERATE OR LOAD LIBRARY OF SIMULATIONS
 if LOAD_AB == 0
     rho = [5:5:100]; %mm
-    mua = [3e-3:1e-3:0.05]; %mm-1
-    mus = [0.5:0.25:5.0]; %mm-1
-%     rho = [5:5:100];
-%     mua = [0:1e-3:0.05];
-%     mus = [0.25:0.25:5.0];
+    mua = [1e-3:1e-3:0.05]; %mm-1
+    mus = [0.25:0.25:5.0]; %mm-1
     ZRhoMuaMus=zeros(numel(mus),numel(mua),numel(rho));
     for is = 1:numel(mus)
         mus_is = mus(is);
@@ -39,13 +40,23 @@ if LOAD_AB == 0
         end
     end
 else
-    load 'Zrhomua'
+    load 'All'
 end
 nr=numel(rho);
 ns=numel(mus);
 na=numel(mua);
 
+RangeRho=[num2str(rho(1)) ',' num2str(rho(2)-rho(1)) ',' num2str(rho(nr))];
+RangeMua=[num2str(mua(1)) ',' num2str(mua(2)-mua(1)) ',' num2str(mua(na))];
+RangeMus=[num2str(mus(1)) ',' num2str(mus(2)-mus(1)) ',' num2str(mus(ns))];
+
+
 %% ITERATE OVER POL ORDER
+sRange=['Mua' RangeMua 'Mus' RangeMus 'Rho' RangeRho];
+sMax=['Err' num2str(MaxErr) 'mmPerc' num2str(MaxPerc) '%'];
+sDir=['Results_' sRange '_' sMax];
+mkdir(sDir);
+
 for iPa=1:3 % iterate over MUS POL Order
     for iPs=1:3 % iterate over MUS POL Order
 
@@ -55,8 +66,8 @@ Z_err=zeros(ns,na,nr); % calculated error on depth (mm)
 
 % perform FIT
 polytype=['poly' num2str(iPa) num2str(iPs)];
-[A_fitresult, A_gof] = createFitNew(mua, mus, AA, polytype, 'AA')
-[B_fitresult, B_gof] = createFitNew(mua, mus, BB, polytype, 'BB')
+[A_fitresult, A_gof] = createFitNew(mua, mus, AA, polytype, 'AA', sDir)
+[B_fitresult, B_gof] = createFitNew(mua, mus, BB, polytype, 'BB', sDir)
 
 % calc error
 for is=1:ns
@@ -102,8 +113,8 @@ for ir=1:nrow
         grid on;
         set(gca,'layer','top')
 
-        if ir==2, caxis([0 3]); end
-        if ir==3, caxis([0 10]); end
+        if ir==2, caxis([0 MaxErr]); end
+        if ir==3, caxis([0 MaxPerc]); end
 
         if(ir==nrow), xlabel('Mua (mm-1)'); end
         if((ic==1)&&(ir==1)), ylabel({'Zmax (mm)';'Mus (mm-1)'}); end
@@ -114,9 +125,8 @@ for ir=1:nrow
     end
 end
 
-Title=['POLYMua' num2str(iPa) 'Mus' num2str(iPs)];
-suptitle(Title);
-NameFig=['Results\' Title];
+suptitle([sRange ' ' sMax ' ' polytype]);
+NameFig=[sDir '\' 'Err_' polytype];
 if SAVE_FIG, saveas(FigError,NameFig,'jpg'); end
 
     end % End iPs

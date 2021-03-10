@@ -1,4 +1,4 @@
-function [fitresult, gof] = createFitNew(mua, mus, Var, TypeFit, title_var)
+function [fitresult, gof] = createFitNew(mua, mus, Var, TypeFit, title_var, sDir)
 %CREATEFIT(MUA,MUS,AA)
 %  Create a fit.
 %
@@ -37,8 +37,9 @@ ylabel( 'mus', 'Interpreter', 'none' );
 zlabel( title_var, 'Interpreter', 'none' );
 title(TypeFit);
 grid on
-view( 28.9, 23.9 );
-NameFig=['Results\' title_var '_' TypeFit];
+%view( 28.9, 23.9 );
+view(50, 50);
+NameFig=[sDir '\' title_var '_' TypeFit];
 saveas(FigPoly,NameFig,'jpg');
 
 
