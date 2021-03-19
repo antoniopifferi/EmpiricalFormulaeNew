@@ -7,7 +7,7 @@ LOAD_AB = 0;
 SAVE_FIG = 1;
 
 %Parameters
-indRho=[1,3,6,10,20];
+indRho=[1,3,7,11,19];
 MaxErr=5; % (mm) max displayed eaaror in plot
 MaxPerc=10; % (%) max percentage relative error
 
@@ -19,9 +19,9 @@ addpath('C:\OneDrivePolimi\OneDrive - Politecnico di Milano\Beta\Programs\Matlab
 
 %% GENERATE OR LOAD LIBRARY OF SIMULATIONS
 if LOAD_AB == 0
-    rho = [5:5:100]; %mm
-    mua = [1e-3:1e-3:0.05]; %mm-1
-    mus = [0.25:0.25:5.0]; %mm-1
+    rho = [5:2.5:50]; %mm
+    mua = [3e-3:1e-3:0.05]; %mm-1
+    mus = [0.5:0.25:5.0]; %mm-1
     ZRhoMuaMus=zeros(numel(mus),numel(mua),numel(rho));
     for is = 1:numel(mus)
         mus_is = mus(is);
@@ -86,8 +86,6 @@ figure, plot(abs(Z_err(:)));
 
 %% Visualise ERROR
 scrsz = get(0,'ScreenSize');
-
-indRho=[1,3,6,10,20];
 
 ncol=numel(indRho);
 nrow=3;
